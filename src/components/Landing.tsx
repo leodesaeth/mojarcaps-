@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import heroImage from "../assets/hero-image.png";
+import heroImage from "../assets/hero-image-new.jpg";
 
 interface LandingProps {
     onStart: () => void;
