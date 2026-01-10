@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import heroImage from "../assets/hero-image.png";
 
 interface LandingProps {
     onStart: () => void;
@@ -34,7 +35,7 @@ export function Landing({ onStart }: LandingProps) {
                 >
                     <div className="relative w-full max-w-[420px] aspect-[4/5] md:aspect-square rounded-[24px] shadow-[0_10px_30px_rgba(0,0,0,0.08)] overflow-hidden bg-[#F6F6FB] border border-zinc-200">
                         <img
-                            src="/src/assets/hero-image.jpg"
+                            src={heroImage}
                             alt="Casal comendo hambúrguer"
                             className="w-full h-full object-cover"
                         />
