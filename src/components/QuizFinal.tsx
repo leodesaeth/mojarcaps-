@@ -62,7 +62,7 @@ export function Quiz() {
         // Simulate analysis steps
         setTimeout(() => {
             setIsAnalyzing(false);
-            navigate("/resultados");
+            navigate("/resultados", { state: { answers: answersState[0] } });
         }, 3500);
     };
 

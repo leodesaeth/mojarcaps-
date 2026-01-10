@@ -11,9 +11,9 @@ import {
     Zap
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 
 // Start Images
@@ -53,10 +53,36 @@ const PLANS = [
     }
 ];
 
+interface Answers {
+    gender: string;
+    weight: string;
+    height: string;
+    goal: string;
+    food_relationship: string;
+    cravings: string;
+    age: string;
+    activity: string;
+}
+
 export function Results() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [activeTab, setActiveTab] = useState("m1");
     const [selectedPlanId, setSelectedPlanId] = useState('3months');
+
+    // Default values if direct access (fallback)
+    const defaultAnswers: Answers = {
+        gender: 'female',
+        weight: '70',
+        height: '165',
+        goal: '10-20',
+        food_relationship: 'control',
+        cravings: 'afternoon',
+        age: '30',
+        activity: 'moderate'
+    };
+
+    const answers: Answers = location.state?.answers || defaultAnswers;
 
     const selectedPlan = PLANS.find(p => p.id === selectedPlanId) || PLANS[2];
 
@@ -64,6 +90,56 @@ export function Results() {
         setSelectedPlanId(planId);
     };
 
+    // Personalization Logic
+    const getWorkoutPlan = (activity: string) => {
+        if (activity === 'sedentary' || activity === 'light') {
+            return [
+                { day: 'Segunda', train: 'Caminhada + Alongamento', time: '30 min' },
+                { day: 'Terça', train: 'Fortalecimento Leve (Casa)', time: '20 min' },
+                { day: 'Quarta', train: 'Caminhada Ritmo Médio', time: '30 min' },
+                { day: 'Quinta', train: 'Descanso Ativo', time: '15 min' },
+                { day: 'Sexta', train: 'Dança ou Movimento', time: '30 min' },
+                { day: 'Sábado', train: 'Caminhada Longa', time: '40 min' },
+                { day: 'Domingo', train: 'Descanso', time: '-' },
+            ];
+        } else {
+            return [
+                { day: 'Segunda', train: 'Treino A - Superior + HIIT', time: '45 min' },
+                { day: 'Terça', train: 'Cardio Moderado + Core', time: '30 min' },
+                { day: 'Quarta', train: 'Treino B - Inferior', time: '45 min' },
+                { day: 'Quinta', train: 'Descanso Ativo / Yoga', time: '20 min' },
+                { day: 'Sexta', train: 'Full Body Funcional', time: '50 min' },
+                { day: 'Sábado', train: 'Cardio Intenso', time: '30 min' },
+                { day: 'Domingo', train: 'Descanso', time: '-' },
+            ];
+        }
+    };
+
+    const getTips = (cravings: string, foodRel: string) => {
+        const tips = [
+            { icon: Target, text: `Seu peso atual (${answers.weight}kg) será nosso ponto de partida` },
+            { icon: Utensils, text: "MÍNIMO 3 litros de água por dia para acelerar o metabolismo" },
+        ];
+
+        if (cravings === 'every_day' || cravings === 'afternoon') {
+            tips.push({ icon: Flame, text: "Estratégia Anti-Doces: Mojacaps 1h após almoço" });
+            tips.push({ icon: Zap, text: "Troque o doce da tarde por fruta com canela" });
+        } else {
+            tips.push({ icon: Flame, text: "Café reforçado: Proteína + Fibras para saciedade" });
+            tips.push({ icon: Zap, text: "Evite carboidratos simples isolados no jantar" });
+        }
+
+        if (foodRel === 'cant_stop' || foodRel === 'snacking') {
+            tips.push({ icon: Salad, text: "Aumente as fibras (saladas) antes do prato principal" });
+        } else {
+            tips.push({ icon: Salad, text: "Mantenha a constância nos horários das refeições" });
+        }
+
+        return tips;
+    };
+
+    const workoutPlan = getWorkoutPlan(answers.activity);
+    const personalizedTips = getTips(answers.cravings, answers.food_relationship);
 
 
     return (
@@ -91,10 +167,10 @@ export function Results() {
                     {/* Tags / Pills */}
                     <div className="flex justify-center gap-3 pt-2">
                         <div className="bg-zinc-50 border border-zinc-100 px-4 py-1.5 rounded-lg text-[10px] font-bold text-zinc-600 uppercase tracking-wide">
-                            75kg
+                            {answers.weight}kg
                         </div>
                         <div className="bg-zinc-50 border border-zinc-100 px-4 py-1.5 rounded-lg text-[10px] font-bold text-zinc-600 uppercase tracking-wide">
-                            170cm
+                            {answers.height}cm
                         </div>
                     </div>
                 </motion.div>
@@ -215,15 +291,7 @@ export function Results() {
 
                             {/* Clean Table */}
                             <div className="space-y-1 mb-8">
-                                {[
-                                    { day: 'Segunda', train: 'Treino A - Superior', time: '45 min' },
-                                    { day: 'Terça', train: 'Nível cardiovascular + Core', time: '30 min' },
-                                    { day: 'Quarta', train: 'Treino B - Inferior', time: '45 min' },
-                                    { day: 'Quinta', train: 'Descanso Ativo', time: '20 min' },
-                                    { day: 'Sexta', train: 'Treino Corpo Inteiro', time: '50 min' },
-                                    { day: 'Sábado', train: 'Descanso', time: '-' },
-                                    { day: 'Domingo', train: 'Descanso', time: '-' },
-                                ].map((item, index) => (
+                                {workoutPlan.map((item, index) => (
                                     <div
                                         key={item.day}
                                         className={cn(
@@ -244,13 +312,7 @@ export function Results() {
                                     Dicas do Mês:
                                 </div>
                                 <ul className="space-y-3">
-                                    {[
-                                        { icon: Target, text: "Seu peso atual (75kg) será nosso ponto de partida" },
-                                        { icon: Utensils, text: "MÍNIMO 3 dias de treino por semana para resultados" },
-                                        { icon: Flame, text: "Café: Ovos + pão integral + frutas + leite de amêndoas" },
-                                        { icon: Salad, text: "Almoço: Frango/peixe + arroz + vegetais + azeite" },
-                                        { icon: Zap, text: "Jantar: Proteína magra + salada grande (sem laticínios)" },
-                                    ].map((item, i) => (
+                                    {personalizedTips.map((item, i) => (
                                         <li key={i} className="flex items-start gap-4 p-1">
                                             <div className="mt-0.5 rounded-full p-1.5 bg-purple-100 shrink-0">
                                                 <item.icon className="w-3 h-3 text-purple-600" />
