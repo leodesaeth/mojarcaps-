@@ -263,7 +263,7 @@ const generateWorkoutPlan = (
 // Gerar dicas personalizadas
 const generateTips = (
     answers: Answers,
-    tmb: number,
+    _tmb: number,
     targetCalories: number
 ): { icon: typeof Target; text: string; priority: number }[] => {
     const tips: { icon: typeof Target; text: string; priority: number }[] = [];
@@ -361,7 +361,7 @@ const generateTips = (
 };
 
 // Descrição do mês
-const getMonthDescription = (month: number, goal: string): { title: string; description: string } => {
+const getMonthDescription = (month: number, _goal: string): { title: string; description: string } => {
     const descriptions: Record<number, { title: string; description: string }> = {
         1: {
             title: 'Adaptação Metabólica',
